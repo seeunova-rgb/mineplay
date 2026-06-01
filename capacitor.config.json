@@ -3,20 +3,7 @@
   "appName": "MINEPLAY",
   "webDir": "www",
   "server": {
-    "androidScheme": "https",
+    "url": "https://seeunova-rgb.github.io/mineplay",
     "cleartext": false
-  },
-  "android": {
-    "allowMixedContent": true,
-    "captureInput": true,
-    "webContentsDebuggingEnabled": false
-  },
-  "plugins": {
-    "SplashScreen": {
-      "launchShowDuration": 1500,
-      "backgroundColor": "#1a0a2e",
-      "androidSplashResourceName": "splash",
-      "showSpinner": false
-    }
   }
 }

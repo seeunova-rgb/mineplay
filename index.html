@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-fullscreen">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>MINEPLAY</title>
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Firebase SDK (โหลดก่อนสคริปต์อื่น) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+</head>
+<body>
+
+  <!-- AUTO-LOGIN LOADING -->
+  <div id="loading-screen" style="
+    position:fixed;inset:0;background:#1a0a2e;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:999;font-family:'Nunito',sans-serif;color:#fff;
+  ">
+    <div style="font-size:2.5rem;margin-bottom:12px;">⛏️</div>
+    <div style="font-size:1.1rem;opacity:.7;">กำลังโหลด...</div>
+  </div>
+
+  <!-- KICKED DIALOG -->
+  <div id="kicked-overlay" style="
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);
+    z-index:9999;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;
+  ">
+    <div style="
+      background:#1e0e3a;border:2px solid #ff3333;border-radius:16px;
+      padding:32px 28px;text-align:center;max-width:320px;color:#fff;
+    ">
+      <div style="font-size:2rem;margin-bottom:12px;">⚠️</div>
+      <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;">ถูกตัดการเชื่อมต่อ</div>
+      <div style="font-size:.9rem;opacity:.8;margin-bottom:20px;">
+        บัญชีนี้ถูกล็อคอินจากอุปกรณ์อื่น<br>ระบบจะพาคุณกลับหน้าล็อคอิน
+      </div>
+      <button onclick="dismissKicked()" style="
+        background:#ff3333;color:#fff;border:none;border-radius:8px;
+        padding:10px 28px;font-size:1rem;cursor:pointer;font-family:inherit;font-weight:700;
+      ">ตกลง</button>
+    </div>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" style="display:none;">
+    <div id="login-box">
+      <div id="login-logo">⛏️ MINEPLAY</div>
+      <div id="login-subtitle">Multiplayer Edition</div>
+
+      <div id="login-tabs">
+        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">เข้าสู่ระบบ</button>
+        <button class="tab-btn" id="tab-register" onclick="switchTab('register')">สมัครสมาชิก</button>
+      </div>
+
+      <div id="login-form">
+        <div class="input-wrap">
+          <label>ชื่อผู้ใช้</label>
+          <input type="text" id="inp-username" placeholder="กรอกชื่อผู้ใช้..." autocomplete="username" maxlength="20">
+        </div>
+        <div class="input-wrap">
+          <label>รหัสผ่าน</label>
+          <input type="password" id="inp-password" placeholder="กรอกรหัสผ่าน..." autocomplete="current-password" maxlength="32">
+        </div>
+        <div id="login-error"></div>
+        <button id="btn-submit" onclick="handleSubmit()">
+          <span id="btn-submit-text">เข้าสู่ระบบ</span>
+          <span id="btn-submit-loader" style="display:none">⏳</span>
+        </button>
+      </div>
+
+      <div id="login-notice">🌐 บัญชีจะถูกแชร์กับผู้เล่นทุกคนในระบบ</div>
+    </div>
+  </div>
+
+  <!-- GAME UI -->
+  <div id="game-ui" style="display:none">
+
+    <div id="ui-top">
+      <div id="title-badge">⛏️ MINEPLAY</div>
+      <div id="hud-info">
+        <div>❤️ <span id="hp">100</span></div>
+        <div>📍 <span id="pos">0,0</span></div>
+      </div>
+      <div id="online-badge" onclick="toggleOnlinePanel()">🟢 <span id="online-count">1</span></div>
+    </div>
+
+    <!-- ปุ่ม logout + toggle debug ลอยมุมซ้ายบน -->
+    <div style="position:fixed;top:12px;left:12px;z-index:500;display:flex;gap:8px;">
+      <button id="btn-logout" onclick="handleLogout()" style="
+        background:rgba(180,30,30,0.85);color:#fff;border:none;border-radius:10px;
+        padding:10px 16px;font-size:1rem;font-family:inherit;font-weight:700;
+        cursor:pointer;backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,0.4);
+      ">🚪</button>
+      <button id="btn-debug" onclick="toggleDebug()" style="
+        background:rgba(0,80,0,0.85);color:#0f0;border:none;border-radius:10px;
+        padding:10px 16px;font-size:1rem;font-family:inherit;font-weight:700;
+        cursor:pointer;backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,0.4);
+      ">🪲</button>
+    </div>
+
+    <div id="online-panel" style="display:none">
+      <div id="online-panel-title">🌐 ผู้เล่นออนไลน์</div>
+      <div id="online-list"></div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="joystick-zone">
+      <div id="joystick-knob"></div>
+    </div>
+
+    <div id="action-zone">
+      <div class="btn-wrap">
+        <div id="btn-run" class="btn-act">💨</div>
+        <div class="btn-lbl">วิ่ง</div>
+      </div>
+    </div>
+
+    <div id="pc-hint">
+      <span><kbd>W</kbd><kbd>S</kbd> เดิน · <kbd>A</kbd><kbd>D</kbd> Strafe</span>
+      <span><kbd>Q</kbd><kbd>E</kbd> / ลากเมาส์ หมุน · <kbd>Shift</kbd> วิ่ง · คลิก = Lock Mouse</span>
+    </div>
+
+  </div>
+
+  <!-- Game scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/collision.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/minimap.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/raycaster.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/online.js"></script>
+  <script src="js/main.js"></script>
+
+  <script>
+    let currentTab = 'login';
+
+    // ── เริ่มเกม หลังล็อคอินสำเร็จ ──────────────────
+    function startGame(user) {
+      Player.state.name     = user.username;
+      Player.state.color    = user.color;
+      Player.state.hatColor = user.hatColor;
+
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('game-ui').style.display = 'block';
+      Game.init();
+      Online.start(user);
+
+      // ตรวจจับถูกเตะออกจากเครื่องอื่น
+      Auth.watchSession(() => {
+        Game.stop();
+        Online.stop();
+        document.getElementById('game-ui').style.display = 'none';
+        document.getElementById('kicked-overlay').style.display = 'flex';
+      });
+    }
+
+    // ── Auto-login ────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', async () => {
+      const result = await Auth.tryAutoLogin();
+      document.getElementById('loading-screen').style.display = 'none';
+
+      if (result.ok) {
+        startGame(Auth.getUser());
+      } else {
+        document.getElementById('login-screen').style.display = 'flex';
+      }
+    });
+
+    // ── Tab switch ────────────────────────────────────
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+      document.getElementById('btn-submit-text').textContent = tab === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+      document.getElementById('login-error').textContent = '';
+      document.getElementById('inp-password').value = '';
+    }
+
+    // ── Submit login/register ─────────────────────────
+    async function handleSubmit() {
+      const username = document.getElementById('inp-username').value.trim();
+      const password = document.getElementById('inp-password').value;
+      const errEl    = document.getElementById('login-error');
+      const loader   = document.getElementById('btn-submit-loader');
+      const btnText  = document.getElementById('btn-submit-text');
+
+      errEl.textContent = '';
+      loader.style.display = 'inline';
+      btnText.style.display = 'none';
+
+      const result = currentTab === 'login'
+        ? await Auth.login(username, password)
+        : await Auth.register(username, password);
+
+      loader.style.display = 'none';
+      btnText.style.display = 'inline';
+
+      if (!result.ok) { errEl.textContent = result.msg; return; }
+
+      startGame(Auth.getUser());
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none')
+        handleSubmit();
+    });
+
+    // ── Kicked dialog ─────────────────────────────────
+    function dismissKicked() {
+      Auth.clearSession();
+      document.getElementById('kicked-overlay').style.display = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('inp-username').value = '';
+      document.getElementById('inp-password').value = '';
+    }
+
+    // ── Toggle online panel ───────────────────────────
+    function toggleDebug() {
+      const el = document.getElementById('debug-box');
+      if (!el) return;
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function toggleOnlinePanel() {
+      const p = document.getElementById('online-panel');
+      p.style.display = p.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // ── Logout ────────────────────────────────────────
+    function handleLogout() {
+      Online.stop();
+      Auth.logout();
+      Game.stop();
+      document.getElementById('game-ui').style.display = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('online-panel').style.display = 'none';
+    }
+  </script>
+
+  <script>
+    window.onerror = function(msg, src, line) {
+      document.body.insertAdjacentHTML("beforeend",
+        "<div style=\"position:fixed;bottom:0;left:0;right:0;background:red;color:#fff;font-size:12px;padding:8px;z-index:99999\">" + msg + "<br>" + src + ":" + line + "</div>"
+      );
+    };
+  </script>
+</body>
+</html>

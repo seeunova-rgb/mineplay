@@ -1,0 +1,427 @@
+/* ═══════════════════════════════════════════════
+   MINEPLAY — style.css
+   ═══════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@700;900&display=swap');
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  width:100%; height:100%;
+  background:#1a0a2e;
+  overflow:hidden;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  font-family:'Nunito', sans-serif;
+}
+
+/* ── TOP HUD ── */
+#ui-top {
+  position:fixed; top:0; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:6px 14px;
+  background:rgba(13,13,26,0.92);
+  border-bottom:2px solid #ff6b35;
+  z-index:300;
+  pointer-events:none;
+}
+#title-badge {
+  font-family:'Bangers', cursive;
+  color:#ff6b35;
+  font-size:clamp(1.1rem, 4vw, 1.8rem);
+  letter-spacing:4px;
+  text-shadow:2px 2px 0 #ff0055, 4px 4px 0 rgba(0,0,0,0.3);
+}
+#hud-info {
+  display:flex; gap:12px;
+  font-size:clamp(0.65rem, 2.5vw, 0.82rem);
+  color:#fff;
+}
+#hud-info span { color:#ffcc00; font-weight:900; }
+#step-badge {
+  font-size:clamp(0.55rem, 2vw, 0.7rem);
+  background:#ff6b35; color:#fff;
+  padding:2px 10px; border-radius:20px;
+  font-weight:900; letter-spacing:1px;
+}
+
+/* ── CANVAS ── */
+#gameCanvas {
+  position:fixed; left:0;
+  width:100%;
+  display:block;
+}
+
+/* ── VIRTUAL JOYSTICK ── */
+#joystick-zone {
+  position:fixed; bottom:24px; left:24px;
+  width:140px; height:140px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.06);
+  border:2.5px solid rgba(255,107,53,0.45);
+  z-index:500;
+  display:none;
+  touch-action:none;
+}
+#joystick-knob {
+  position:absolute;
+  width:56px; height:56px;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #ff8c5a, #cc4400);
+  border:3px solid rgba(255,255,255,0.8);
+  box-shadow:0 0 16px rgba(255,107,53,0.7);
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+
+/* ── ACTION BUTTONS ── */
+#action-zone {
+  position:fixed; bottom:24px; right:20px;
+  display:none;
+  flex-direction:column; align-items:center; gap:8px;
+  z-index:500;
+}
+.btn-wrap {
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+}
+.btn-lbl {
+  color:#ffcc00; font-size:0.6rem; font-weight:900;
+  text-shadow:1px 1px 2px #000;
+}
+.btn-act {
+  width:64px; height:64px;
+  border-radius:50%;
+  border:3px solid rgba(255,255,255,0.4);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.5rem;
+  box-shadow:0 4px 16px rgba(0,0,0,0.5);
+  cursor:pointer;
+  touch-action:none;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform 0.07s, filter 0.07s;
+}
+.btn-act:active, .btn-act.pressed {
+  transform:scale(0.84);
+  filter:brightness(1.4);
+}
+#btn-run {
+  background:radial-gradient(circle at 35% 35%, #ffe066, #ff9900);
+}
+
+/* ── PC HINT ── */
+#pc-hint {
+  position:fixed; bottom:10px; left:50%;
+  transform:translateX(-50%);
+  color:#777; font-size:0.72rem;
+  display:flex; gap:14px;
+  z-index:200;
+  pointer-events:none;
+  white-space:nowrap;
+}
+#pc-hint kbd {
+  background:#2a2a3a; color:#bbb;
+  padding:1px 6px; border-radius:4px;
+  border:1px solid #444; font-family:monospace;
+}
+
+/* ═══════════════════════════════════════════════
+   LOGIN SCREEN
+   ═══════════════════════════════════════════════ */
+
+#login-screen {
+  position: fixed;
+  inset: 0;
+  background: #0d0820;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(255,107,53,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(255,0,85,0.1) 0%, transparent 55%),
+    radial-gradient(ellipse at 60% 85%, rgba(46,134,171,0.1) 0%, transparent 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+#login-box {
+  background: rgba(20, 12, 40, 0.95);
+  border: 2px solid rgba(255,107,53,0.5);
+  border-radius: 20px;
+  padding: 36px 32px 28px;
+  width: min(380px, 92vw);
+  box-shadow:
+    0 0 0 1px rgba(255,107,53,0.15),
+    0 0 60px rgba(255,107,53,0.1),
+    0 20px 60px rgba(0,0,0,0.7);
+  animation: loginFadeIn 0.4s ease;
+}
+
+@keyframes loginFadeIn {
+  from { opacity:0; transform:translateY(20px) scale(0.97); }
+  to   { opacity:1; transform:none; }
+}
+
+#login-logo {
+  font-family: 'Bangers', cursive;
+  font-size: clamp(2rem, 8vw, 2.8rem);
+  color: #ff6b35;
+  letter-spacing: 5px;
+  text-align: center;
+  text-shadow: 2px 2px 0 #ff0055, 4px 4px 0 rgba(0,0,0,0.4);
+  margin-bottom: 4px;
+}
+
+#login-subtitle {
+  text-align: center;
+  color: #aaa;
+  font-size: 0.78rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+#login-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 22px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background: #ff6b35;
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(255,107,53,0.4);
+}
+
+.input-wrap {
+  margin-bottom: 14px;
+}
+
+.input-wrap label {
+  display: block;
+  color: #bbb;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.input-wrap input {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,107,53,0.25);
+  border-radius: 10px;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-wrap input:focus {
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255,107,53,0.15);
+}
+
+.input-wrap input::placeholder { color: #555; }
+
+#login-error {
+  min-height: 20px;
+  color: #ff4466;
+  font-size: 0.8rem;
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+#btn-submit {
+  width: 100%;
+  background: linear-gradient(135deg, #ff6b35, #ff0055);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-family: 'Bangers', cursive;
+  font-size: 1.1rem;
+  letter-spacing: 3px;
+  padding: 13px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(255,107,53,0.4);
+  transition: transform 0.1s, box-shadow 0.1s;
+  margin-bottom: 14px;
+}
+
+#btn-submit:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 10px rgba(255,107,53,0.3);
+}
+
+#login-notice {
+  text-align: center;
+  color: #555;
+  font-size: 0.7rem;
+}
+
+/* ═══════════════════════════════════════════════
+   ONLINE BADGE & PANEL
+   ═══════════════════════════════════════════════ */
+
+#online-badge {
+  background: rgba(0,200,80,0.18);
+  border: 1.5px solid rgba(0,200,80,0.4);
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 0.78rem;
+  color: #4cff90;
+  font-weight: 900;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+#online-badge:hover { background: rgba(0,200,80,0.28); }
+
+#online-panel {
+  position: fixed;
+  top: 50px;
+  right: 10px;
+  background: rgba(10,6,26,0.95);
+  border: 1.5px solid rgba(255,107,53,0.35);
+  border-radius: 14px;
+  padding: 14px 16px;
+  min-width: 180px;
+  z-index: 400;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+}
+
+#online-panel-title {
+  color: #ff6b35;
+  font-weight: 900;
+  font-size: 0.82rem;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.online-dot {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #ddd;
+  font-size: 0.8rem;
+  padding: 4px 0;
+}
+
+.online-dot.self { color: #ffcc00; }
+
+.online-dot .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #4cff90;
+  box-shadow: 0 0 6px #4cff90;
+  flex-shrink: 0;
+}
+
+#btn-logout {
+  margin-top: 12px;
+  width: 100%;
+  background: rgba(255,50,50,0.15);
+  border: 1px solid rgba(255,50,50,0.3);
+  border-radius: 8px;
+  color: #ff6666;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 7px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#btn-logout:hover { background: rgba(255,50,50,0.25); }
+
+/* ═══════════════════════════════════════════════
+   LANDSCAPE MOBILE
+   ═══════════════════════════════════════════════ */
+
+@media (orientation: landscape) and (max-height: 500px) {
+
+  /* HUD บางลง */
+  #ui-top { padding: 3px 10px; }
+  #title-badge { font-size: 1rem; letter-spacing: 2px; }
+  #hud-info { font-size: 0.65rem; gap: 8px; }
+
+  /* Joystick เล็กลง */
+  #joystick-zone { width: 100px; height: 100px; bottom: 10px; left: 10px; }
+  #joystick-knob { width: 40px; height: 40px; }
+
+  /* Action buttons เล็กลง */
+  #action-zone { bottom: 10px; right: 10px; gap: 4px; }
+  .btn-act { width: 50px; height: 50px; font-size: 1.1rem; }
+  .btn-lbl { font-size: 0.5rem; }
+
+  /* ปุ่ม logout/debug มุมซ้ายบน เล็กลง */
+  #btn-logout, #btn-debug {
+    padding: 6px 10px !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* pc-hint ซ่อนในแนวนอนมือถือ */
+  #pc-hint { display: none !important; }
+
+  /* online-panel ขยับให้ไม่บัง HUD */
+  #online-panel { top: 36px; }
+
+  /* Login box — 2 คอลัมน์ */
+  #login-box {
+    padding: 12px 20px 10px;
+    width: min(600px, 96vw);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 20px;
+    align-items: start;
+  }
+  #login-logo { font-size: 1.5rem; margin-bottom: 2px; }
+  #login-subtitle { font-size: 0.62rem; margin-bottom: 8px; }
+  #login-tabs { margin-bottom: 8px; }
+  .input-wrap { margin-bottom: 8px; }
+  .input-wrap input { padding: 7px 12px; font-size: 0.85rem; }
+  #btn-submit { padding: 9px; margin-bottom: 6px; }
+  #login-notice { font-size: 0.62rem; }
+}
+
+/* safe area สำหรับ notch / punch-hole */
+@supports (padding: env(safe-area-inset-left)) {
+  #joystick-zone {
+    left: max(24px, env(safe-area-inset-left));
+  }
+  #action-zone {
+    right: max(20px, env(safe-area-inset-right));
+  }
+  @media (orientation: landscape) and (max-height: 500px) {
+    #joystick-zone {
+      left: max(10px, env(safe-area-inset-left));
+      bottom: max(10px, env(safe-area-inset-bottom));
+    }
+    #action-zone {
+      right: max(10px, env(safe-area-inset-right));
+      bottom: max(10px, env(safe-area-inset-bottom));
+    }
+  }
+}
