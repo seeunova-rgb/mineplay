@@ -8,6 +8,13 @@
   },
   "android": {
     "backgroundColor": "#1a0a2e",
-    "captureInput": true
+    "captureInput": true,
+    "orientation": "landscape"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0,
+      "backgroundColor": "#1a0a2e"
+    }
   }
 }
