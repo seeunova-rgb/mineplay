@@ -1,0 +1,59 @@
+name: Build MINEPLAY APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:   # กดปุ่ม run เองได้บน GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. ดึงโค้ด
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. ติดตั้ง Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. ติดตั้ง Java 17
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 4. ติดตั้ง Android SDK
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      # 5. ติดตั้ง Capacitor dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # 6. Sync ไฟล์เกมเข้า Android project
+      - name: Capacitor sync
+        run: npx cap sync android
+
+      # 7. ให้สิทธิ์ gradlew
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
+      # 8. Build Debug APK
+      - name: Build APK
+        run: |
+          cd android
+          ./gradlew assembleDebug --no-daemon
+
+      # 9. อัพโหลด APK เป็น artifact (ดาวน์โหลดได้หลัง build)
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MINEPLAY-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
