@@ -17,10 +17,10 @@ const Game = (() => {
   }
 
   function resize() {
-    const hudH = getHudHeight();
-    canvas.style.top = hudH + 'px';
     CW = canvas.width  = window.innerWidth;
-    CH = canvas.height = window.innerHeight - hudH;
+    CH = canvas.height = window.innerHeight;
+    canvas.style.top  = '0';
+    canvas.style.left = '0';
     scale = 1;
     OX = 0;
     OY = 0;
