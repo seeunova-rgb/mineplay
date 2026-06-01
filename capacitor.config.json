@@ -5,5 +5,9 @@
   "server": {
     "url": "https://seeunova-rgb.github.io/mineplay",
     "cleartext": false
+  },
+  "android": {
+    "backgroundColor": "#1a0a2e",
+    "captureInput": true
   }
 }
