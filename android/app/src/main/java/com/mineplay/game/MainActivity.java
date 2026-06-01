@@ -14,12 +14,6 @@ public class MainActivity extends BridgeActivity {
         hideSystemUI();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        hideSystemUI();
-    }
-
     private void hideSystemUI() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             getWindow().setDecorFitsSystemWindows(false);
