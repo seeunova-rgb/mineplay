@@ -1,31 +1,19 @@
-// ═══════════════════════════════════════════════
-//  MINEPLAY — main.js  (FPV Edition)
-//  Game loop + renderer init
-// ═══════════════════════════════════════════════
-
 const Game = (() => {
   const canvas = document.getElementById('gameCanvas');
   const ctx    = canvas.getContext('2d');
   const { VW, VH, COLOR_BG } = CFG;
 
-  let CW, CH, scale = 1, OX = 0, OY = 0;
+  let CW, CH;
   let running = false;
 
-  function getHudHeight() {
-    const hud = document.getElementById('ui-top');
-    return hud ? hud.getBoundingClientRect().height : 0;
-  }
-
   function resize() {
-    const hudH = getHudHeight();
-    canvas.style.top = hudH + 'px';
     CW = canvas.width  = window.innerWidth;
-    CH = canvas.height = window.innerHeight - hudH;
-    const sx = CW / VW;
-    const sy = CH / VH;
-    scale = Math.min(sx, sy);
-    OX = (CW - VW * scale) / 2;
-    OY = (CH - VH * scale) / 2;
+    CH = canvas.height = window.innerHeight;
+    canvas.style.position = 'fixed';
+    canvas.style.top  = '0';
+    canvas.style.left = '0';
+    canvas.style.width  = '100vw';
+    canvas.style.height = '100vh';
   }
 
   let lastT = 0;
@@ -47,20 +35,11 @@ const Game = (() => {
     ctx.fillRect(0, 0, CW, CH);
 
     ctx.save();
-    ctx.translate(OX, OY);
-    ctx.scale(scale, scale);
-    ctx.beginPath(); ctx.rect(0, 0, VW, VH); ctx.clip();
+    ctx.scale(CW / VW, CH / VH);
 
-    // ── FPV Render ──
     Raycaster.render(ctx, Player.state, VW, VH);
-
-    // Particles (ฝุ่น) วาดบนพื้น
     Particles.update(ctx);
-
-    // Online players (2D sprites บน minimap / ตำแหน่งโลก)
     Online.drawOthers(ctx);
-
-    // HUD overlay (HP bar, crosshair ถูกวาดใน Raycaster แล้ว)
     Player.draw(ctx);
 
     ctx.restore();
