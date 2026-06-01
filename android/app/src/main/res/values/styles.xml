@@ -7,4 +7,8 @@
         <item name="colorPrimaryDark">#1a0a2e</item>
         <item name="colorAccent">#ff6b35</item>
     </style>
+
+    <style name="AppTheme.NoActionBarLaunch" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splash</item>
+    </style>
 </resources>
