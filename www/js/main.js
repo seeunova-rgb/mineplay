@@ -21,11 +21,9 @@ const Game = (() => {
     canvas.style.top = hudH + 'px';
     CW = canvas.width  = window.innerWidth;
     CH = canvas.height = window.innerHeight - hudH;
-    const sx = CW / VW;
-    const sy = CH / VH;
-    scale = Math.min(sx, sy);
-    OX = (CW - VW * scale) / 2;
-    OY = (CH - VH * scale) / 2;
+    scale = 1;
+    OX = 0;
+    OY = 0;
   }
 
   let lastT = 0;
