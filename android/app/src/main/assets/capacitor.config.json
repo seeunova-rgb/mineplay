@@ -1,0 +1,20 @@
+{
+	"appId": "com.mineplay.game",
+	"appName": "MINEPLAY",
+	"webDir": "www",
+	"server": {
+		"url": "https://seeunova-rgb.github.io/mineplay",
+		"cleartext": false
+	},
+	"android": {
+		"backgroundColor": "#1a0a2e",
+		"captureInput": true,
+		"orientation": "landscape"
+	},
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 0,
+			"backgroundColor": "#1a0a2e"
+		}
+	}
+}
